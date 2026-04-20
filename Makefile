@@ -15,7 +15,7 @@ env-cleanup:
 	@read -p "Delete all volume files? This will erase data. [y/N]: " ans; \
 	if [ "$$ans" = "y" ]; then \
 		docker compose down todoapp-postgres port-forwarder && \
-		rm -rf out/pgdata && \
+		rm -rf ${PROJECT_ROOT}/out/pgdata && \
 		echo "Volume files deleted"; \
 	else \
 		echo "Cleanup cancelled"; \
@@ -67,4 +67,4 @@ todoapp-run:
 	export POSTGRES_HOST=localhost && \
 	export POSTGRES_PORT=5433 && \
 	go mod tidy && \
-	go run cmd/todoapp/main.go
+	go run ${PROJECT_ROOT}/cmd/todoapp/main.go

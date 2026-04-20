@@ -1,21 +1,18 @@
 package core_http_server
 
-import "net/http"
+import (
+	"net/http"
+
+	core_http_middleware "github.com/KirillSerge/golang-todoapp/internal/core/transport/http/middlrware"
+)
 
 type Route struct {
-	Method  string
-	Path    string
-	Handler http.HandlerFunc
+	Method     string
+	Path       string
+	Handler    http.HandlerFunc
+	Middleware []core_http_middleware.Middleware
 }
 
-func NewRoute(
-	mathod string,
-	path string,
-	handler http.HandlerFunc,
-) Route {
-	return Route{
-		Method:  mathod,
-		Path:    path,
-		Handler: handler,
-	}
+func (r *Route) WithMiddleware() http.Handler {
+	return core_http_middleware.ChainMiddleware(r.Handler, r.Middleware...)
 }

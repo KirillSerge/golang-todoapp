@@ -1,6 +1,6 @@
 package users_postgres_repository
 
-import core_postgres_pool "github.com/KirillSerge/golang-todoapp/internal/core/repository/postgres/conn"
+import core_postgres_pool "github.com/KirillSerge/golang-todoapp/internal/core/repository/postgres/pool"
 
 type UsersRepository struct {
 	pool core_postgres_pool.Pool

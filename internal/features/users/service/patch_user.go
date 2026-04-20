@@ -22,6 +22,6 @@ func (s *UsersService) PatchUser(ctx context.Context, id int, patch domain.UserP
 		return domain.User{}, fmt.Errorf("patch user: %w", err)
 	}
 
-	return patchedUser, err
+	return patchedUser, nil
 
 }

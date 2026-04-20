@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	core_logger "github.com/KirillSerge/golang-todoapp/internal/core/logger"
-	core_postgres_pool "github.com/KirillSerge/golang-todoapp/internal/core/repository/postgres/conn"
+	core_pgx_pool "github.com/KirillSerge/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/KirillSerge/golang-todoapp/internal/core/transport/http/middlrware"
 	core_http_server "github.com/KirillSerge/golang-todoapp/internal/core/transport/http/server"
 	users_postgres_repository "github.com/KirillSerge/golang-todoapp/internal/features/users/repository/postgres"
@@ -24,7 +24,6 @@ func main() {
 	)
 	defer cancel()
 
-	fmt.Println("Hello, todo app!")
 	logger, err := core_logger.NewLogger(core_logger.NewConfigMust())
 	if err != nil {
 		fmt.Println("failed to init application logger:", err)
@@ -33,9 +32,10 @@ func main() {
 	defer logger.Close()
 
 	logger.Debug("initiazling postgres connection pool")
-	pool, err := core_postgres_pool.NewConnectionPool(
+
+	pool, err := core_pgx_pool.NewPool(
 		ctx,
-		core_postgres_pool.NewConfigMust(),
+		core_pgx_pool.NewConfigMust(),
 	)
 	if err != nil {
 		logger.Fatal("failed to init postgres connection pool", zap.Error(err))
@@ -53,13 +53,17 @@ func main() {
 		logger,
 		core_http_middleware.RequestID(),
 		core_http_middleware.Logger(logger),
-		core_http_middleware.Panic(),
 		core_http_middleware.Trace(),
+		core_http_middleware.Panic(),
 	)
-	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
-	apiVersionRouter.RegisterRouter(usersTransportHTTP.Routes()...)
+	apiVersionRouterV1 := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
+	apiVersionRouterV1.RegisterRouter(usersTransportHTTP.Routes()...)
 
-	httpServer.RegisterAPIRouters(apiVersionRouter)
+	/*apiVersionRouterV2 := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion2, core_http_middleware.Dummy("api v2 middleware"))
+	apiVersionRouterV2.RegisterRouter(usersTransportHTTP.Routes()...)*/
+
+	httpServer.RegisterAPIRouters(apiVersionRouterV1)
+	//apiVersionRouterV2)
 
 	if err := httpServer.Run(ctx); err != nil {
 		logger.Error("HTTP server run error", zap.Error(err))
