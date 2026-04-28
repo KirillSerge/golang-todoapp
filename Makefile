@@ -1,4 +1,4 @@
-SHELL := C:/Program Files/Git/bin/bash.exe
+SHELL := /bin/bash
 
 include .env
 export
