@@ -25,7 +25,7 @@ env-port-forward:
 	@docker compose up -d port-forwarder
 
 env-port-close:
-	@docker compose down -d port-forwarder
+	@docker compose down  port-forwarder
 
 wait-for-db:
 	@echo "Waiting for postgres to be ready..."; \
@@ -77,3 +77,12 @@ todoapp-run:
 	export POSTGRES_PORT=5433 && \
 	go mod tidy && \
 	go run ${PROJECT_ROOT}/cmd/todoapp/main.go
+
+todoapp-deploy:
+	@docker compose up -d --build todoapp
+
+todoapp-undeploy:
+	@docker compose down todoapp
+
+ps:
+	@docker compose ps
