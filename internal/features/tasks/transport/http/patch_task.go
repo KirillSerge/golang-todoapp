@@ -17,6 +17,26 @@ type PathTaskRequest struct {
 	Completed   core_http_types.Nullable[bool]   `json:"completed"`
 }
 
+// PatchTasks      godoc
+// @Summary      Обновить задачу
+// @Description  Обновляет информацию об уже существующей задаче
+// @Description  Изменение информации об уже существующем в системе пользователи
+// @Description  ### Логика обновления полей (Three-state logic):
+// @Description  1. **Поле не переданно**:`description` игнорируется, значение в БД не меняется
+// @Description  2. **Явно передано значение**: `"description":"выйти на прогулку с бобиком"` - устанавливает новый номер телефона в БД
+// @Description  3. **Передан null**: `"description":null` - очищает поле в БД (set to NULL)
+// @Description  Ограничение: `title`и `completed` не может быть выставлен как null
+// @Tags         tasks
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "ID изменяемой задачи"
+// @Param        request body PathTaskRequest true "PatchTask тело запроса"
+// @Success      200 {object} GetTasksResponse "Усрешно измененная задача"
+// @Failure      400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure      404 {object} core_http_response.ErrorResponse "Task not found"
+// @Failure      409 {object} core_http_response.ErrorResponse "Conflict"
+// @Failure      500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router       /tasks/{id} [patch]
 func (r *PathTaskRequest) Validate() error {
 	if r.Title.Set {
 		if r.Title.Value == nil {
