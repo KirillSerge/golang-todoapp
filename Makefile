@@ -1,4 +1,8 @@
-SHELL := /bin/bash
+ifeq ($(OS),Windows_NT)
+    SHELL := C:/Program Files/Git/bin/bash.exe
+else
+    SHELL := /bin/bash
+endif
 
 include .env
 export
@@ -83,6 +87,14 @@ todoapp-deploy:
 
 todoapp-undeploy:
 	@docker compose down todoapp
+
+swagger-gen:
+	@docker compose run --rm swagger \
+		init \
+		-g cmd/todoapp/main.go \
+		-o docs \
+		--parseInternal \
+		--parseDependency
 
 ps:
 	@docker compose ps
